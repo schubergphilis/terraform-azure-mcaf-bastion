@@ -1,3 +1,10 @@
+resource "azurerm_resource_group" "this" {
+  for_each = var.bastion
+
+  name = each.value.resource_group_name
+  location = each.value.location
+}
+
 resource "azurerm_bastion_host" "this" {
   for_each = var.bastion
 
