@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 3.0.0"
+    }
+  }
+}
+
 resource "azurerm_resource_group" "resource_group" {
   for_each = { for k, v in var.bastion : k => v.resource_group_name }
 
