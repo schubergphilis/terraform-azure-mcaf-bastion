@@ -1,4 +1,6 @@
 terraform {
+  required_version = ">= 1.0.0"
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -7,48 +9,43 @@ terraform {
   }
 }
 
-resource "azurerm_resource_group" "resource_group" {
-  for_each = { for k, v in var.bastion : k => v.resource_group_name }
-
-  name     = each.value
-  location = var.bastion[each.key].location
+provider "azurerm" {
+  features = {}
 }
 
-resource "azurerm_public_ip" "public_ip" {
-  for_each = var.bastion
+resource "azurerm_resource_group" "this" {
+  name     = var.resource_group_name
+  location = var.location
+}
 
-  name                = each.value.ip_configuration.public_ip.name
-  resource_group_name = azurerm_resource_group.resource_group[each.key].name
-  location            = each.value.location
-  allocation_method   = each.value.ip_configuration.public_ip.allocation_method
-  sku                 = each.value.ip_configuration.public_ip.sku
+resource "azurerm_public_ip" "this" {
+  name                = var.public_ip_name
+  resource_group_name = azurerm_resource_group.this.name
+  location            = var.location
+  allocation_method   = "Static"
+  sku                 = "Standard"
 
-  idle_timeout_in_minutes = lookup(each.value.ip_configuration.public_ip, "idle_timeout_in_minutes", null)
-  tags                    = lookup(each.value.ip_configuration.public_ip, "tags", null)
-  zones                   = lookup(each.value.ip_configuration.public_ip, "zones", null)
+  idle_timeout_in_minutes = var.idle_timeout_in_minutes
+
+  tags = var.tags
 }
 
 resource "azurerm_bastion_host" "this" {
-  for_each = var.bastion
+  name                = var.bastion_name
+  location            = var.location
+  resource_group_name = azurerm_resource_group.this.name
 
-  name                = each.value.name
-  location            = each.value.location
-  resource_group_name = azurerm_resource_group.resource_group[each.key].name
+  copy_paste_enabled = var.copy_paste_enabled
+  file_copy_enabled  = var.file_copy_enabled
+  scale_units        = var.scale_units
+  sku                = "Standard"
+  virtual_network_id = var.virtual_network_id
 
-  copy_paste_enabled     = lookup(each.value, "copy_paste_enabled", false)
-  file_copy_enabled      = lookup(each.value, "file_copy_enabled", false)
-  ip_connect_enabled     = lookup(each.value, "ip_connect_enabled", false)
-  kerberos_enabled       = lookup(each.value, "kerberos_enabled", false)
-  scale_units            = lookup(each.value, "scale_units", 2)
-  shareable_link_enabled = lookup(each.value, "shareable_link_enabled", false)
-  sku                    = lookup(each.value, "sku", "Standard")
-  tunneling_enabled      = lookup(each.value, "tunneling_enabled", false)
-  virtual_network_id     = lookup(each.value, "virtual_network_id", null)
-  tags                   = lookup(each.value, "tags", {})
+  tags = var.tags
 
   ip_configuration {
-    name                 = each.value.ip_configuration.name
-    subnet_id            = each.value.ip_configuration.subnet_id
-    public_ip_address_id = azurerm_public_ip.public_ip[each.key].id
+    name                 = "ipconfig1"
+    subnet_id            = var.subnet_id
+    public_ip_address_id = azurerm_public_ip.this.id
   }
 }
