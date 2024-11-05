@@ -73,12 +73,12 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "my-resource-group"
+  name     = "name-rsg"
   location = "eastus"
 }
 
 resource "azurerm_virtual_network" "example" {
-  name                = "my-vnet"
+  name                = "name-vnet"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
@@ -100,14 +100,14 @@ module "azure_bastion" {
     subnet_id           = azurerm_subnet.bastion_subnet.id
 
     # Optional variables
-    bastion_name        = "my-bastion-host"
-    public_ip_name      = "my-bastion-pip"
+    bastion_name        = "name-bast"
+    public_ip_name      = "name-pip"
     copy_paste_enabled  = true
     file_copy_enabled   = true
     scale_units         = 2
     tags = {
-      Environment = "Production"
-      Owner       = "Team A"
+      Environment = "Development"
+      Owner       = "Team X"
     }
   }
 }
