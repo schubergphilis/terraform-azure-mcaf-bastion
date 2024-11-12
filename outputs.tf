@@ -15,12 +15,12 @@ output "subnet_id" {
 
 output "bastion_host_id" {
   description = "The ID of the Azure Bastion Host."
-  value       = azurerm_bastion_host.this.id
+  value       = azurerm_bastion_host.bastion.id
 }
 
 output "bastion_host_name" {
   description = "The name of the Azure Bastion Host."
-  value       = azurerm_bastion_host.this.name
+  value       = azurerm_bastion_host.bastion.name
 }
 
 output "public_ip_id" {

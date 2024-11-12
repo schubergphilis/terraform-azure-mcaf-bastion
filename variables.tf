@@ -18,7 +18,11 @@ variable "subnet_prefixes" {
   type        = map(string)
 }
 
-# Optional Bastion variables
+variable "nsg_resource_group_name" {
+  description = "The name of the resource group where NSG is created."
+  type        = string
+}
+
 variable "bastion" {
   description = "Configuration for the Azure Bastion Host"
   type = object({
@@ -30,8 +34,7 @@ variable "bastion" {
     idle_timeout_in_minutes = optional(number, 4)
     tags                    = optional(map(string), {})
 
-    # Additional optional attributes
-    zones                   = optional(list(string), [])
-    domain_name_label       = optional(string, null)
+    zones             = optional(list(string), [])
+    domain_name_label = optional(string, null)
   })
 }

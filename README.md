@@ -1,53 +1,50 @@
-# Azure Bastion Module
+# Azure AD User Onboarding Terraform Module
 
 ## Overview
 
-This Terraform module configures a comprehensive, secure, and scalable Azure environment incorporating network infrastructure and a Bastion Host for streamlined and secure administrative access. Ideal for enterprise environments, this module ensures best practices and scalability.
+The **Azure AD User Onboarding** Terraform module automates the process of managing user access within Azure Active Directory (Azure AD). It streamlines onboarding by:
 
-## Prerequisites
+- **Consolidating Email Inputs**: Accepts a list of user email addresses for onboarding.
+- **Automated Invitations**: Sends invitations to external users who are not part of the tenant.
+- **Security Group Management**: Creates a dedicated Azure AD security group.
+- **Group Membership Assignment**: Adds invited users to the security group.
 
-- **Terraform**: Ensure you have Terraform installed. This configuration requires Terraform version `>= 1.0.0`.
-- **Azure Subscription**: An active Azure subscription with permissions to create resources.
+## Features
 
-## Usage
+- **Efficient User Management**: Automates the invitation and group assignment process.
+- **Customizable Invitations**: Personalize invitation messages and specify additional recipients.
+- **Security Group Provisioning**: Automatically creates and manages Azure AD security groups.
+- **Scalable Design**: Suitable for organizations of all sizes, facilitating bulk user management.
 
-To use this module, create a Terraform configuration file in your project and reference this module’s location. Below is an example to get you started.
+## Requirements
 
-### Example Configuration
+- **Terraform**: Version 1.0 or later.
+- **Providers**:
+  - [`azuread`](https://registry.terraform.io/providers/hashicorp/azuread/latest) version `>= 2.22.0`.
 
-```hcl
-provider "azurerm" {
-  features {}
-}
+## Module Inputs
 
-module "bastion_setup" {
-  source = "./path_to_your_bastion_module"  # Path to your Bastion module directory
+| Variable Name                | Description                                                  | Type           | Default                                  | Required |
+|------------------------------|--------------------------------------------------------------|----------------|------------------------------------------|----------|
+| `emails`                     | List of user email addresses for onboarding.                | `list(string)` | N/A                                      | Yes      |
+| `group_display_name`         | Display name for the Azure AD security group.               | `string`       | N/A                                      | Yes      |
+| `redirect_url`               | The URL to redirect users to after they accept the invitation.| `string`      | `"https://portal.azure.com/"`            | No       |
+| `invitation_body`            | The body of the invitation email.                           | `string`       | `"Hello! You are invited to join our Azure AD tenant. Please accept the invitation to gain access."` | No       |
+| `additional_recipients`      | Additional email addresses to include in the invitation.     | `list(string)` | `[]`                                     | No       |
+| `managed_identity_client_id` | The client ID of the managed identity to use for authentication (optional). | `string` | `null`                                   | No       |
 
-  resource_group_name = "example-rg"
-  location            = "eastus"
-  address_space       = ["10.0.0.0/16"]
-  subnet_prefixes     = {
-    "AzureBastionSubnet" = "10.0.1.0/24"
-  }
+## Module Outputs
 
-  bastion = {
-    name                    = "example-bastion"
-    public_ip_name          = "example-public-ip"
-    copy_paste_enabled      = true
-    file_copy_enabled       = true
-    scale_units             = 2
-    idle_timeout_in_minutes = 5
-    tags = {
-      Environment = "Production"
-      Owner       = "Infrastructure Team"
-    }
-    
-    # Additional attributes
-    zones                   = ["1"]
-    domain_name_label       = "example-domain-label"
-  }
-}
+| Output Name       | Description                                               |
+|-------------------|-----------------------------------------------------------|
+| `group_id`        | The ID of the created Azure AD security group.            |
+| `group_name`      | The display name of the created security group.           |
+| `invited_users`   | List of users who were sent invitations.                  |
+| `invited_user_ids`| Map of invited user emails to their Azure AD object IDs.   |
 
-output "bastion_host_name" {
-  value = module.bastion_setup.bastion_host_name
-}
+## Usage Example
+
+Here's how you can consume the **Azure AD User Onboarding** module in your Terraform configuration.
+
+### **Directory Structure**
+
