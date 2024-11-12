@@ -48,3 +48,13 @@ Here's how you can consume the **Azure AD User Onboarding** module in your Terra
 
 ### **Directory Structure**
 
+- bastion/
+  - main.tf
+  - variables.tf
+  - outputs.tf
+- network/
+  - main.tf
+  - variables.tf
+  - outputs.tf
+- example/
+  - main.tf
