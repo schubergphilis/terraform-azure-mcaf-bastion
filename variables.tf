@@ -1,40 +1,20 @@
-variable "resource_group_name" {
-  description = "The name of the resource group."
-  type        = string
-}
-
-variable "location" {
-  description = "The Azure region where resources will be deployed."
-  type        = string
-}
-
-variable "address_space" {
-  description = "The address space for the virtual network."
-  type        = list(string)
-}
-
-variable "subnet_prefixes" {
-  description = "The address prefixes for the subnets."
-  type        = map(string)
-}
-
-variable "nsg_resource_group_name" {
-  description = "The name of the resource group where NSG is created."
-  type        = string
-}
-
 variable "bastion" {
   description = "Configuration for the Azure Bastion Host"
   type = object({
-    name                    = optional(string, "bastion-host")
+    location              = string  # The Azure region where the Bastion Host will be deployed.
+    resource_group_name   = string  # The name of the resource group for the Bastion resources.
+    subnet_id             = string  # The ID of the subnet for the Bastion Host (must be 'AzureBastionSubnet').
+    virtual_network_id    = string  # The ID of the virtual network.
+
+    # Optional attributes with default values or null
+    bastion_name            = optional(string, "bastion-host")
     public_ip_name          = optional(string, "bastion-pip")
     copy_paste_enabled      = optional(bool, true)
     file_copy_enabled       = optional(bool, true)
     scale_units             = optional(number, 2)
     idle_timeout_in_minutes = optional(number, 4)
     tags                    = optional(map(string), {})
-
-    zones             = optional(list(string), [])
-    domain_name_label = optional(string, null)
+    zones                   = optional(list(string), [])
+    domain_name_label       = optional(string, null)
   })
 }
