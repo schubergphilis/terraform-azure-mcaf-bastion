@@ -41,8 +41,6 @@ variable "bastion" {
     name               = string
     subnet_id          = string
     virtual_network_id = string
-
-    # Optional attributes with default values or null
     sku                       = optional(string, "Standard")
     kerberos_enabled          = optional(bool, false)
     scale_units               = optional(number, 2)
@@ -58,8 +56,6 @@ variable "bastion" {
     domain_name_label         = optional(string, null)
     zones                     = optional(list(string), [])
   })
-  default     = {}
-  nullable    = false
   description = <<DESCRIPTION
 The Azure Bastion Host configuration.
 
