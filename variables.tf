@@ -1,8 +1,3 @@
-variable "name" {
-  type        = string
-  description = "The name of the Azure Bastion Host."
-}
-
 variable "resource_group_name" {
   type        = string
   description = "The name of the resource group where the Azure Bastion resources are located."
@@ -38,9 +33,9 @@ variable "public_ip" {
 
 variable "bastion" {
   type = object({
-    name               = string
-    subnet_id          = string
-    virtual_network_id = string
+    name                      = string
+    subnet_id                 = string
+    virtual_network_id        = string
     sku                       = optional(string, "Standard")
     kerberos_enabled          = optional(bool, false)
     scale_units               = optional(number, 2)

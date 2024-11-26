@@ -21,7 +21,7 @@ resource "azurerm_public_ip" "this" {
 }
 
 resource "azurerm_bastion_host" "this" {
-  name                      = var.name
+  name                      = var.bastion.name
   location                  = var.location
   resource_group_name       = var.resource_group_name
   copy_paste_enabled        = var.bastion.copy_paste_enabled
