@@ -36,7 +36,7 @@ resource "azurerm_bastion_host" "this" {
   virtual_network_id        = var.bastion.virtual_network_id
 
   ip_configuration {
-    name                 = "${var.name}-ipconfig"
+    name                 = "${var.bastion.name}-ipconfig"
     subnet_id            = var.bastion.subnet_id
     public_ip_address_id = azurerm_public_ip.this.id
   }
