@@ -21,7 +21,6 @@ resource "azurerm_resource_group" "bast" {
   )
 }
 
-
 module "bastion" {
   source = "../../"
 
