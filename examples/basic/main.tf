@@ -29,7 +29,7 @@ module "bastion" {
   location            = var.location
 
   bastion = {
-    name               = module.naming["bast"].naming.security.azure_bastion
+    name               = "bastion"
     subnet_id          = data.azurerm_subnet.azurebastionsubnet.id
     tunneling_enabled  = true
     copy_paste_enabled = true
