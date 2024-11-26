@@ -58,9 +58,9 @@ variable "bastion" {
     domain_name_label         = optional(string, null)
     zones                     = optional(list(string), [])
   })
-  default = null
-  nullable = false
-  description               = <<DESCRIPTION
+  default     = null
+  nullable    = false
+  description = <<DESCRIPTION
 The Azure Bastion Host configuration.
 
 - `name` - The name of the Azure Bastion Host.

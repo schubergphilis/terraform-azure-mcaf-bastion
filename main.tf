@@ -41,7 +41,7 @@ resource "azurerm_bastion_host" "this" {
     public_ip_address_id = azurerm_public_ip.this.id
   }
 
-    tags = merge(
+  tags = merge(
     try(var.tags),
     try(var.bastion.tags),
     tomap({
@@ -49,5 +49,5 @@ resource "azurerm_bastion_host" "this" {
     })
   )
 
-  depends_on = [ azurerm_public_ip.this ]
+  depends_on = [azurerm_public_ip.this]
 }
