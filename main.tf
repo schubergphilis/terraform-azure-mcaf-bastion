@@ -30,6 +30,7 @@ resource "azurerm_bastion_host" "this" {
   kerberos_enabled          = var.bastion.kerberos_enabled
   scale_units               = var.bastion.scale_units
   shareable_link_enabled    = var.bastion.shareable_link_enabled
+  session_recording_enabled = var.bastion.session_recording_enabled
   sku                       = var.bastion.sku
   tunneling_enabled         = var.bastion.tunneling_enabled
   virtual_network_id        = var.bastion.virtual_network_id

@@ -88,4 +88,8 @@ The Azure Bastion Host configuration.
     condition     = var.bastion.ip_connect_enabled == true ? (var.bastion.sku == "Standard" || var.bastion.sku == "Premium") : true
     error_message = "IP Based connection functionality is only availble for Standard or Premium SKU."
   }
+  validation {
+    condition     = var.bastion.virtual_network_id > 0 ? var.bastion.sku == "Developer" : true
+    error_message = "Copy-paste functionality is only availble for Premium SKU."
+  }
 }
