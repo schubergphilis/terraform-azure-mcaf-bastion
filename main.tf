@@ -29,7 +29,7 @@ resource "azurerm_bastion_host" "this" {
   ip_connect_enabled        = var.bastion.ip_connect_enabled
   kerberos_enabled          = var.bastion.kerberos_enabled
   scale_units               = var.bastion.scale_units
-  session_recording_enabled = var.bastion.session_recording_enabled
+  session_recording_enabled = var.bastion.sku == "Premium" ? var.bastion.session_recording_enabled : null
   shareable_link_enabled    = var.bastion.shareable_link_enabled
   sku                       = var.bastion.sku
   tunneling_enabled         = var.bastion.tunneling_enabled
