@@ -1,5 +1,12 @@
 terraform {
   required_version = ">= 1.8"
+
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 4.5, < 5.0"
+    }
+  }
 }
 
 resource "azurerm_resource_group" "bast" {
