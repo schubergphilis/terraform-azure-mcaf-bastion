@@ -21,43 +21,46 @@ variable "tags" {
 }
 
 variable "public_ip" {
-  type        = optional(object({
-    name                = optional(string)
-    resource_group_name = optional(string)
-    location            = optional(string)
-    allocation_method   = optional(string, "Static")
-    sku                 = optional(string, "Standard")
+  type = object({
+    name                    = optional(string)
+    resource_group_name     = optional(string)
+    location                = optional(string)
+    allocation_method       = optional(string, "Static")
+    sku                     = optional(string, "Standard")
     idle_timeout_in_minutes = optional(number)
     tags                    = optional(map(string))
     zones                   = optional(list(string), [])
     domain_name_label       = optional(string)
-  }))
+  })
   default     = {}
   description = "(Optional) The public IP address associated with the Azure Bastion Host."
 }
 
 variable "bastion" {
   type = object({
-    name                  = string
-    subnet_id             = string
-    virtual_network_id    = string
+    name               = string
+    subnet_id          = string
+    virtual_network_id = string
 
     # Optional attributes with default values or null
-    sku                     = optional(string, "Standard")
-    kerberos_enabled        = optional(bool, false)
-    scale_units             = optional(number, 2)
-    tunneling_enabled       = optional(bool, false)
-    shareable_link_enabled  = optional(bool, false)
+    sku                       = optional(string, "Standard")
+    kerberos_enabled          = optional(bool, false)
+    scale_units               = optional(number, 2)
+    tunneling_enabled         = optional(bool, false)
+    shareable_link_enabled    = optional(bool, false)
     session_recording_enabled = optional(bool, false)
-    public_ip_name          = optional(string, null)
-    ip_connect_enabled      = optional(bool, false)
-    copy_paste_enabled      = optional(bool, true)
-    file_copy_enabled       = optional(bool, true)
-    idle_timeout_in_minutes = optional(number, 4)
-    tags                    = optional(map(string), {})
-    domain_name_label       = optional(string, null)
-    zones                   = optional(list(string), [])
-    description = <<DESCRIPTION
+    public_ip_name            = optional(string, null)
+    ip_connect_enabled        = optional(bool, false)
+    copy_paste_enabled        = optional(bool, true)
+    file_copy_enabled         = optional(bool, true)
+    idle_timeout_in_minutes   = optional(number, 4)
+    tags                      = optional(map(string), {})
+    domain_name_label         = optional(string, null)
+    zones                     = optional(list(string), [])
+  })
+  default = null
+  nullable = false
+  description               = <<DESCRIPTION
 The Azure Bastion Host configuration.
 
 - `name` - The name of the Azure Bastion Host.
@@ -80,8 +83,7 @@ The Azure Bastion Host configuration.
 - `domain_name_label` - The domain name label of the Azure Bastion Host. Default is null.
 - `zones` - The availability zones of the Azure Bastion Host. Default is [].
 
-DESCRIPTION
-})
+  DESCRIPTION
 
   validation {
     condition     = can(regex("^(Basic|Standard|Developer|Premium)$", var.bastion.sku))

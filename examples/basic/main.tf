@@ -5,4 +5,5 @@ terraform {
 module "bastion" {
   source = "../.."
 
+
 }
