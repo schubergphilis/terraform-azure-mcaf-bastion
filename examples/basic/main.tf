@@ -30,7 +30,7 @@ module "bastion" {
 
   bastion = {
     name               = "bastion"
-    subnet_id          = data.azurerm_subnet.azurebastionsubnet.id
+    subnet_id          = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/somerandomname/providers/Microsoft.Network/virtualNetworks/vnet/subnets/bastion"
     tunneling_enabled  = true
     copy_paste_enabled = true
   }
