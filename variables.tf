@@ -35,7 +35,7 @@ variable "bastion" {
   type = object({
     name                      = string
     subnet_id                 = string
-    virtual_network_id        = string
+    virtual_network_id        = optional(string, null)
     sku                       = optional(string, "Standard")
     kerberos_enabled          = optional(bool, false)
     scale_units               = optional(number, 2)
@@ -58,7 +58,7 @@ The Azure Bastion Host configuration.
 - `location` - The location of the Azure Bastion Host.
 - `resource_group_name` - The name of the resource group where the Azure Bastion Host is located.
 - `subnet_id` - The ID of the subnet where the Azure Bastion Host will be deployed.
-- `virtual_network_id` - The ID of the virtual network where the Azure Bastion Host will be deployed.
+- `virtual_network_id` - The ID of the virtual network where the Azure Bastion Host will be deployed. Default is null. only for Developer SKU.
 - `sku` - The SKU of the Azure Bastion Host. Default is 'Standard'. Valid values are 'Basic', 'Standard', 'Developer' or 'Premium'.
 - `kerberos_enabled` - Specifies whether Kerberos authentication is enabled for the Azure Bastion Host. Default is false.
 - `scale_units` - The number of scale units for the Azure Bastion Host. Default is 2.
