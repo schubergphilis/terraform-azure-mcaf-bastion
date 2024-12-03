@@ -1,4 +1,3 @@
-
 resource "azurerm_public_ip" "this" {
   name                = var.public_ip.name != null ? var.public_ip.name : "${var.bastion.name}-pip"
   resource_group_name = var.public_ip.resource_group_name != null ? var.public_ip.resource_group_name : var.resource_group_name
