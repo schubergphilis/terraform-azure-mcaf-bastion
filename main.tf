@@ -1,3 +1,5 @@
+data "azurerm_subscription" "current" {}
+
 resource "azurerm_public_ip" "this" {
   count = var.bastion.private_only_enabled ? 0 : 1
   name                = var.public_ip.name != null ? var.public_ip.name : "${var.bastion.name}-pip"
