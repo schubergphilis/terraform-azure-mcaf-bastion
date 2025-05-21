@@ -42,6 +42,7 @@ variable "bastion" {
     tunneling_enabled         = optional(bool, false)
     shareable_link_enabled    = optional(bool, false)
     session_recording_enabled = optional(bool, false)
+    private_only_enabled      = optional(bool, false)
     public_ip_name            = optional(string, null)
     ip_connect_enabled        = optional(bool, false)
     copy_paste_enabled        = optional(bool, false)
@@ -64,6 +65,7 @@ The Azure Bastion Host configuration.
 - `scale_units` - The number of scale units for the Azure Bastion Host. Default is 2.
 - `tunneling_enabled` - Specifies whether tunneling functionality is enabled for the Azure Bastion Host. Default is false.
 - `shareable_link_enabled` - Specifies whether shareable link functionality is enabled for the Azure Bastion Host. Default is false.
+- `private_only_enabled` - Specifies whether the private only mode is enabled for the Azure Bastion Host. Default is false.
 - `session_recording_enabled` - Specifies whether session recording functionality is enabled for the Azure Bastion Host. Default is false.
 - `public_ip_name` - The name of the public IP address associated with the Azure Bastion Host. Default is null.
 - `ip_connect_enabled` - Specifies whether IP connect functionality is enabled for the Azure Bastion Host. Default is false.
