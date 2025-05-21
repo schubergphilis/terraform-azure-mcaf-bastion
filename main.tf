@@ -1,4 +1,5 @@
 resource "azurerm_public_ip" "this" {
+  count = var.bastion.private_only_enabled ? 0 : 1
   name                = var.public_ip.name != null ? var.public_ip.name : "${var.bastion.name}-pip"
   resource_group_name = var.public_ip.resource_group_name != null ? var.public_ip.resource_group_name : var.resource_group_name
   location            = var.public_ip.location != null ? var.public_ip.location : var.location
@@ -19,27 +20,41 @@ resource "azurerm_public_ip" "this" {
   )
 }
 
-resource "azurerm_bastion_host" "this" {
-  name                      = var.bastion.name
-  location                  = var.location
-  resource_group_name       = var.resource_group_name
-  copy_paste_enabled        = var.bastion.copy_paste_enabled
-  file_copy_enabled         = var.bastion.file_copy_enabled
-  ip_connect_enabled        = var.bastion.ip_connect_enabled
-  kerberos_enabled          = var.bastion.kerberos_enabled
-  scale_units               = var.bastion.scale_units
-  shareable_link_enabled    = var.bastion.shareable_link_enabled
-  session_recording_enabled = var.bastion.session_recording_enabled
-  sku                       = var.bastion.sku
-  tunneling_enabled         = var.bastion.tunneling_enabled
-  virtual_network_id        = var.bastion.virtual_network_id
-
-  ip_configuration {
-    name                 = "${var.bastion.name}-ipconfig"
-    subnet_id            = var.bastion.subnet_id
-    public_ip_address_id = azurerm_public_ip.this.id
+resource "azapi_resource" "bastion" {
+  type = "Microsoft.Network/bastionHosts@2024-05-01"
+  body = {
+    sku = {
+      name = var.bastion.sku
+    }
+    zones = var.bastion.zones
+    properties = {
+      disableCopyPaste         = var.bastion.copy_paste_enabled
+      enableFileCopy           = var.bastion.file_copy_enabled
+      enableIpConnect          = var.bastion.ip_connect_enabled
+      enableKerberos           = var.bastion.kerberos_enabled
+      enablePrivateOnlyBastion = var.bastion.private_only_enabled
+      enableSessionRecording   = var.bastion.session_recording_enabled
+      enableShareableLink      = var.bastion.shareable_link_enabled
+      enableTunneling          = var.bastion.tunneling_enabled
+      ipConfigurations = [
+        {
+          name = "${var.bastion.name}-ipconfig"
+          properties = {
+            privateIPAllocationMethod = "Dynamic"
+            publicIPAddress           =  var.bastion.private_only_enabled ? null : azurerm_public_ip.this[0].id
+            subnet = {
+              id = var.bastion.subnet_id
+            }
+          }
+        }
+      ]
+      scaleUnits = var.bastion.scale_units
+    }
   }
-
+  location  = var.location
+  name      = var.bastion.name
+  parent_id = "/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourceGroups/${var.resource_group_name}"
+  response_export_values = ["properties.dnsName"]
   tags = merge(
     try(var.tags),
     try(var.bastion.tags),
@@ -47,6 +62,4 @@ resource "azurerm_bastion_host" "this" {
       "Resource Type" = "Azure Bastion"
     })
   )
-
-  depends_on = [azurerm_public_ip.this]
 }
