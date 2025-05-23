@@ -1,19 +1,19 @@
-output "bastion_host_id" {
-  description = "The ID of the Azure Bastion Host."
-  value       = azurerm_bastion_host.this.id
-}
+# output "dns_name" {
+#   description = "The FQDN of the Azure Bastion resource"
+#   value       = azurerm_bastion_host.this.dns_name
+# }
 
-output "bastion_host_name" {
-  description = "The name of the Azure Bastion Host."
-  value       = azurerm_bastion_host.this.name
-}
+# output "name" {
+#   description = "The name of the Azure Bastion resource"
+#   value       = azurerm_bastion_host.this.name
+# }
 
-output "public_ip_id" {
-  description = "The ID of the Public IP address."
-  value       = azurerm_public_ip.this.id
-}
+# output "resource" {
+#   description = "The Azure Bastion resource"
+#   value       = azurerm_bastion_host.this
+# }
 
-output "public_ip_address" {
-  description = "The IP address of the Public IP."
-  value       = azurerm_public_ip.this.ip_address
-}
+# output "resource_id" {
+#   description = "The ID of the Azure Bastion resource"
+#   value       = azurerm_bastion_host.this.id
+# }
