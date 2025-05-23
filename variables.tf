@@ -42,6 +42,7 @@ variable "bastion" {
     tunneling_enabled         = optional(bool, false)
     shareable_link_enabled    = optional(bool, false)
     session_recording_enabled = optional(bool, false)
+    private_only_enabled      = optional(bool, false)
     public_ip_name            = optional(string, null)
     ip_connect_enabled        = optional(bool, false)
     copy_paste_enabled        = optional(bool, false)
@@ -64,6 +65,7 @@ The Azure Bastion Host configuration.
 - `scale_units` - The number of scale units for the Azure Bastion Host. Default is 2.
 - `tunneling_enabled` - Specifies whether tunneling functionality is enabled for the Azure Bastion Host. Default is false.
 - `shareable_link_enabled` - Specifies whether shareable link functionality is enabled for the Azure Bastion Host. Default is false.
+- `private_only_enabled` - Specifies whether the private only mode is enabled for the Azure Bastion Host. Default is false.
 - `session_recording_enabled` - Specifies whether session recording functionality is enabled for the Azure Bastion Host. Default is false.
 - `public_ip_name` - The name of the public IP address associated with the Azure Bastion Host. Default is null.
 - `ip_connect_enabled` - Specifies whether IP connect functionality is enabled for the Azure Bastion Host. Default is false.
@@ -82,14 +84,14 @@ The Azure Bastion Host configuration.
   }
   validation {
     condition     = var.bastion.session_recording_enabled == true ? var.bastion.sku == "Premium" : true
-    error_message = "Session recording functionality is only availble for Premium SKU."
+    error_message = "Session recording functionality is only available for Premium SKU."
   }
   validation {
     condition     = var.bastion.ip_connect_enabled == true ? (var.bastion.sku == "Standard" || var.bastion.sku == "Premium") : true
-    error_message = "IP Based connection functionality is only availble for Standard or Premium SKU."
+    error_message = "IP Based connection functionality is only available for Standard or Premium SKU."
   }
   validation {
     condition     = var.bastion.virtual_network_id != null ? var.bastion.sku == "Developer" : true
-    error_message = "Virtual Network ID functionality is only availble for Developer SKU."
+    error_message = "Virtual Network ID functionality is only available for Developer SKU."
   }
 }
