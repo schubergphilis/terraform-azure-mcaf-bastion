@@ -1,40 +1,56 @@
-# terraform {
-#   required_version = ">= 1.8"
+terraform {
+  required_version = ">= 1.8"
 
-#   required_providers {
-#     azurerm = {
-#       source  = "hashicorp/azurerm"
-#       version = ">= 4.5, < 5.0"
-#     }
-#   }
-# }
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 4.5, < 5.0"
+    }
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.0"
+    }
+  }
+}
 
-# resource "azurerm_resource_group" "bast" {
-#   name     = var.resource_group_name
-#   location = var.location
+provider "azurerm" {
+  features {}
+}
 
-#   tags = merge(
-#     try(var.tags),
-#     tomap({
-#       "Resource Type" = "Resource Group"
-#     })
-#   )
-# }
+provider "azapi" {}
 
-# module "bastion" {
-#   source = "../../"
+resource "azurerm_resource_group" "this" {
+  name     = "rg-bastion-basic"
+  location = "westeurope"
+}
 
-#   resource_group_name = var.resource_group_name
-#   location            = var.location
+resource "azurerm_virtual_network" "this" {
+  name                = "vnet-bastion-basic"
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
+  address_space       = ["10.0.0.0/16"]
+}
 
-#   bastion = {
-#     name               = "bastion"
-#     subnet_id          = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/somerandomname/providers/Microsoft.Network/virtualNetworks/vnet/subnets/bastion"
-#     tunneling_enabled  = true
-#     copy_paste_enabled = true
-#   }
+resource "azurerm_subnet" "bastion" {
+  name                 = "AzureBastionSubnet"
+  resource_group_name  = azurerm_resource_group.this.name
+  virtual_network_name = azurerm_virtual_network.this.name
+  address_prefixes     = ["10.0.1.0/26"]
+}
 
-#   tags = var.tags
+module "bastion" {
+  source = "../../"
 
-#   depends_on = [azurerm_resource_group.bast]
-# }
+  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+
+  bastion = {
+    name      = "bas-basic"
+    subnet_id = azurerm_subnet.bastion.id
+    sku       = "Basic"
+  }
+
+  tags = {
+    Environment = "dev"
+  }
+}
