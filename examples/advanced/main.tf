@@ -20,12 +20,12 @@ provider "azurerm" {
 provider "azapi" {}
 
 resource "azurerm_resource_group" "this" {
-  name     = "rg-bastion-complete"
+  name     = "rg-bastion-private"
   location = "westeurope"
 }
 
 resource "azurerm_virtual_network" "this" {
-  name                = "vnet-bastion-complete"
+  name                = "vnet-bastion-private"
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   address_space       = ["10.0.0.0/16"]
@@ -38,6 +38,10 @@ resource "azurerm_subnet" "bastion" {
   address_prefixes     = ["10.0.1.0/26"]
 }
 
+# Private-only Bastion deployment (no public IP).
+# Requires Premium SKU. Access is only possible via private IP,
+# ensuring no internet-routable endpoint is exposed.
+
 module "bastion" {
   source = "../../"
 
@@ -45,9 +49,10 @@ module "bastion" {
   location            = azurerm_resource_group.this.location
 
   bastion = {
-    name                      = "bas-complete"
+    name                      = "bas-private"
     subnet_id                 = azurerm_subnet.bastion.id
     sku                       = "Premium"
+    private_only_enabled      = true
     kerberos_enabled          = true
     scale_units               = 4
     tunneling_enabled         = true
@@ -63,26 +68,10 @@ module "bastion" {
     }
   }
 
-  public_ip = {
-    name              = "pip-bastion-complete"
-    allocation_method = "Static"
-    sku               = "Standard"
-    zones             = ["1", "2", "3"]
-    domain_name_label = "bastion-complete"
-
-    tags = {
-      Component = "Bastion Public IP"
-    }
-  }
-
   tags = {
     Environment = "production"
     ManagedBy   = "Terraform"
   }
-}
-
-output "bastion_dns_name" {
-  value = module.bastion.dns_name
 }
 
 output "bastion_id" {
