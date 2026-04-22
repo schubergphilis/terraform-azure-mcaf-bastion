@@ -70,7 +70,7 @@ resource "azapi_resource" "bastion" {
   location               = var.location
   name                   = var.bastion.name
   parent_id              = "/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourceGroups/${var.resource_group_name}"
-  response_export_values = ["properties.dnsName"]
+  response_export_values = { dnsName = "properties.dnsName" }
   tags = merge(
     try(var.tags),
     try(var.bastion.tags),

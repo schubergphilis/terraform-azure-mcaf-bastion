@@ -1,6 +1,6 @@
 output "dns_name" {
   description = "The FQDN of the Azure Bastion resource"
-  value       = azapi_resource.bastion.output.properties.dnsName
+  value       = azapi_resource.bastion.output.dnsName
 }
 
 output "name" {
