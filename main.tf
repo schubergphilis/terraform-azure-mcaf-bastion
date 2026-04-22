@@ -1,7 +1,12 @@
+locals {
+  is_developer = var.bastion.sku == "Developer"
+  needs_pip    = !local.is_developer && !var.bastion.private_only_enabled
+}
+
 data "azurerm_subscription" "current" {}
 
 resource "azurerm_public_ip" "this" {
-  count = var.bastion.private_only_enabled ? 0 : 1
+  count               = local.needs_pip ? 1 : 0
   name                = var.public_ip.name != null ? var.public_ip.name : "${var.bastion.name}-pip"
   resource_group_name = var.public_ip.resource_group_name != null ? var.public_ip.resource_group_name : var.resource_group_name
   location            = var.public_ip.location != null ? var.public_ip.location : var.location
@@ -23,14 +28,14 @@ resource "azurerm_public_ip" "this" {
 }
 
 resource "azapi_resource" "bastion" {
-  type = "Microsoft.Network/bastionHosts@2024-05-01"
+  type = "Microsoft.Network/bastionHosts@2025-03-01"
   body = {
     sku = {
       name = var.bastion.sku
     }
     zones = var.bastion.zones
     properties = {
-      disableCopyPaste         = var.bastion.copy_paste_enabled
+      disableCopyPaste         = !var.bastion.copy_paste_enabled
       enableFileCopy           = var.bastion.file_copy_enabled
       enableIpConnect          = var.bastion.ip_connect_enabled
       enableKerberos           = var.bastion.kerberos_enabled
@@ -38,25 +43,34 @@ resource "azapi_resource" "bastion" {
       enableSessionRecording   = var.bastion.session_recording_enabled
       enableShareableLink      = var.bastion.shareable_link_enabled
       enableTunneling          = var.bastion.tunneling_enabled
-      ipConfigurations = [
+      scaleUnits               = var.bastion.scale_units
+
+      ipConfigurations = local.is_developer ? null : [
         {
           name = "${var.bastion.name}-ipconfig"
           properties = {
             privateIPAllocationMethod = "Dynamic"
-            publicIPAddress           =  var.bastion.private_only_enabled ? null : azurerm_public_ip.this[0].id
+            publicIPAddress           = local.needs_pip ? { id = azurerm_public_ip.this[0].id } : null
             subnet = {
               id = var.bastion.subnet_id
             }
           }
         }
       ]
-      scaleUnits = var.bastion.scale_units
+
+      virtualNetwork = local.is_developer ? { id = var.bastion.virtual_network_id } : null
+
+      networkAcls = local.is_developer && var.bastion.network_acls != null ? {
+        ipRules = [for rule in var.bastion.network_acls.ip_rules : {
+          addressPrefix = rule.address_prefix
+        }]
+      } : null
     }
   }
-  location  = var.location
-  name      = var.bastion.name
-  parent_id = "/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourceGroups/${var.resource_group_name}"
-  response_export_values = ["properties.dnsName"]
+  location               = var.location
+  name                   = var.bastion.name
+  parent_id              = "/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourceGroups/${var.resource_group_name}"
+  response_export_values = { dnsName = "properties.dnsName" }
   tags = merge(
     try(var.tags),
     try(var.bastion.tags),
