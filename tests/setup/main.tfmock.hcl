@@ -1,6 +1,6 @@
 mock_resource "azapi_resource" {
   defaults = {
-    id     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/bastionHosts/test-bastion"
+    id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/bastionHosts/test-bastion"
     output = {
       properties = {
         dnsName = "bst-00000000-0000-0000-0000-000000000000.bastion.azure.com"
