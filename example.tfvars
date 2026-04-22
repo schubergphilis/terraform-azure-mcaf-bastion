@@ -6,8 +6,8 @@ bastion_resource_group_name = "test-bastion-rg"
 location                    = "eastus"
 
 # Virtual network and subnet
-vnet_name    = "test-vnet"
-subnet_name  = "AzureBastionSubnet"
+vnet_name   = "test-vnet"
+subnet_name = "AzureBastionSubnet"
 
 # Bastion configuration
 bastion = {
@@ -21,6 +21,6 @@ bastion = {
     Environment = "Production"
     Owner       = "Infrastructure Team"
   }
-  zones                   = ["1"]
-  domain_name_label       = "test-domain-label"
+  zones             = ["1"]
+  domain_name_label = "test-domain-label"
 }
