@@ -230,3 +230,71 @@ run "standard_sku_rejects_missing_subnet_id" {
 
   expect_failures = [var.bastion]
 }
+
+# --- Premium SKU: private-only rejects certain features ---
+
+run "private_only_rejects_shareable_link" {
+  command = plan
+
+  variables {
+    bastion = {
+      name                   = "test-bastion"
+      subnet_id              = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/test-vnet/subnets/AzureBastionSubnet"
+      sku                    = "Premium"
+      private_only_enabled   = true
+      shareable_link_enabled = true
+    }
+  }
+
+  expect_failures = [var.bastion]
+}
+
+run "private_only_rejects_tunneling" {
+  command = plan
+
+  variables {
+    bastion = {
+      name                 = "test-bastion"
+      subnet_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/test-vnet/subnets/AzureBastionSubnet"
+      sku                  = "Premium"
+      private_only_enabled = true
+      tunneling_enabled    = true
+    }
+  }
+
+  expect_failures = [var.bastion]
+}
+
+run "private_only_rejects_file_copy" {
+  command = plan
+
+  variables {
+    bastion = {
+      name                 = "test-bastion"
+      subnet_id            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/test-vnet/subnets/AzureBastionSubnet"
+      sku                  = "Premium"
+      private_only_enabled = true
+      file_copy_enabled    = true
+    }
+  }
+
+  expect_failures = [var.bastion]
+}
+
+# --- Session recording: incompatible with native client (tunneling) ---
+
+run "session_recording_rejects_tunneling" {
+  command = plan
+
+  variables {
+    bastion = {
+      name                      = "test-bastion"
+      subnet_id                 = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/test-rg/providers/Microsoft.Network/virtualNetworks/test-vnet/subnets/AzureBastionSubnet"
+      sku                       = "Premium"
+      session_recording_enabled = true
+      tunneling_enabled         = true
+    }
+  }
+
+  expect_failures = [var.bastion]
+}

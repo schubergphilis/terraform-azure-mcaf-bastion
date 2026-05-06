@@ -28,7 +28,8 @@ resource "azurerm_public_ip" "this" {
 }
 
 resource "azapi_resource" "bastion" {
-  type = "Microsoft.Network/bastionHosts@2025-03-01"
+  type                      = "Microsoft.Network/bastionHosts@2025-05-01"
+  schema_validation_enabled = false # azapi provider does not yet include the 2025-05-01 schema; the API itself is available
   body = {
     sku = {
       name = var.bastion.sku
@@ -48,13 +49,17 @@ resource "azapi_resource" "bastion" {
       ipConfigurations = local.is_developer ? null : [
         {
           name = "${var.bastion.name}-ipconfig"
-          properties = {
-            privateIPAllocationMethod = "Dynamic"
-            publicIPAddress           = local.needs_pip ? { id = azurerm_public_ip.this[0].id } : null
-            subnet = {
-              id = var.bastion.subnet_id
-            }
-          }
+          properties = merge(
+            {
+              privateIPAllocationMethod = "Dynamic"
+              subnet = {
+                id = var.bastion.subnet_id
+              }
+            },
+            local.needs_pip ? {
+              publicIPAddress = { id = azurerm_public_ip.this[0].id }
+            } : {}
+          )
         }
       ]
 

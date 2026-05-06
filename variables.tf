@@ -134,4 +134,20 @@ The Azure Bastion Host configuration.
     condition     = var.bastion.network_acls != null ? var.bastion.sku == "Developer" : true
     error_message = "Network ACLs are only available for Developer SKU."
   }
+  validation {
+    condition     = var.bastion.private_only_enabled && var.bastion.shareable_link_enabled ? false : true
+    error_message = "Shareable link is not supported with private-only deployment."
+  }
+  validation {
+    condition     = var.bastion.private_only_enabled && var.bastion.tunneling_enabled ? false : true
+    error_message = "Tunneling is not supported with private-only deployment."
+  }
+  validation {
+    condition     = var.bastion.private_only_enabled && var.bastion.file_copy_enabled ? false : true
+    error_message = "File copy is not supported with private-only deployment as it requires tunneling."
+  }
+  validation {
+    condition     = var.bastion.session_recording_enabled && var.bastion.tunneling_enabled ? false : true
+    error_message = "Session recording and native client (tunneling) cannot be enabled together."
+  }
 }
