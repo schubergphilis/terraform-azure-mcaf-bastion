@@ -1,6 +1,32 @@
 locals {
   is_developer = var.bastion.sku == "Developer"
   needs_pip    = !local.is_developer && !var.bastion.private_only_enabled
+
+  identity_system_assigned_user_assigned = (
+    var.managed_identities.system_assigned &&
+    length(var.managed_identities.user_assigned_resource_ids) > 0
+    ) ? {
+    this = {
+      type         = "SystemAssigned, UserAssigned"
+      identity_ids = var.managed_identities.user_assigned_resource_ids
+    }
+  } : null
+
+  identity_system_assigned = var.managed_identities.system_assigned ? {
+    this = {
+      type         = "SystemAssigned"
+      identity_ids = null
+    }
+  } : null
+
+  identity_user_assigned = (
+    length(var.managed_identities.user_assigned_resource_ids) > 0
+    ) ? {
+    this = {
+      type         = "UserAssigned"
+      identity_ids = var.managed_identities.user_assigned_resource_ids
+    }
+  } : null
 }
 
 data "azurerm_subscription" "current" {}
@@ -28,7 +54,24 @@ resource "azurerm_public_ip" "this" {
 }
 
 resource "azapi_resource" "bastion" {
-  type = "Microsoft.Network/bastionHosts@2025-03-01"
+  name                      = var.bastion.name
+  location                  = var.location
+  parent_id                 = "/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourceGroups/${var.resource_group_name}"
+  type                      = "Microsoft.Network/bastionHosts@2025-05-01"
+  schema_validation_enabled = false # azapi provider does not yet include the 2025-05-01 schema; the API itself is available
+  dynamic "identity" {
+    for_each = coalesce(
+      local.identity_system_assigned_user_assigned,
+      local.identity_system_assigned,
+      local.identity_user_assigned,
+      {}
+    )
+
+    content {
+      type         = identity.value.type
+      identity_ids = identity.value.identity_ids
+    }
+  }
   body = {
     sku = {
       name = var.bastion.sku
@@ -48,13 +91,17 @@ resource "azapi_resource" "bastion" {
       ipConfigurations = local.is_developer ? null : [
         {
           name = "${var.bastion.name}-ipconfig"
-          properties = {
-            privateIPAllocationMethod = "Dynamic"
-            publicIPAddress           = local.needs_pip ? { id = azurerm_public_ip.this[0].id } : null
-            subnet = {
-              id = var.bastion.subnet_id
-            }
-          }
+          properties = merge(
+            {
+              privateIPAllocationMethod = "Dynamic"
+              subnet = {
+                id = var.bastion.subnet_id
+              }
+            },
+            local.needs_pip ? {
+              publicIPAddress = { id = azurerm_public_ip.this[0].id }
+            } : {}
+          )
         }
       ]
 
@@ -67,10 +114,7 @@ resource "azapi_resource" "bastion" {
       } : null
     }
   }
-  location               = var.location
-  name                   = var.bastion.name
-  parent_id              = "/subscriptions/${data.azurerm_subscription.current.subscription_id}/resourceGroups/${var.resource_group_name}"
-  response_export_values = { dnsName = "properties.dnsName" }
+  response_export_values = { dnsName = "properties.dnsName", identityPrincipalId = "identity.principalId" }
   tags = merge(
     try(var.tags),
     try(var.bastion.tags),

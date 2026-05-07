@@ -20,12 +20,12 @@ provider "azurerm" {
 provider "azapi" {}
 
 resource "azurerm_resource_group" "this" {
-  name     = "rg-bastion-advanced"
+  name     = "rg-bastion-private"
   location = "westeurope"
 }
 
 resource "azurerm_virtual_network" "this" {
-  name                = "vnet-bastion-advanced"
+  name                = "vnet-bastion-private"
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   address_space       = ["10.0.0.0/16"]
@@ -38,13 +38,13 @@ resource "azurerm_subnet" "bastion" {
   address_prefixes     = ["10.0.1.0/26"]
 }
 
-# Full-featured Premium Bastion deployment with a public IP.
-# Enables all available Premium features including native client
-# (tunneling), file copy, shareable links, and IP connect.
+# Private-only Bastion deployment with session recording (no public IP).
+# Requires Premium SKU. Access is only possible via private IP,
+# ensuring no internet-routable endpoint is exposed.
 #
-# Note: session recording is omitted because it cannot be enabled
-# together with native client (tunneling). See the private example
-# for a session recording deployment.
+# Note: session recording and native client (tunneling) cannot be
+# enabled together -- tunneling and features that depend on it
+# (file copy, shareable link) are omitted here.
 
 module "bastion" {
   source = "../../"
@@ -53,17 +53,16 @@ module "bastion" {
   location            = azurerm_resource_group.this.location
 
   bastion = {
-    name                   = "bas-advanced"
-    subnet_id              = azurerm_subnet.bastion.id
-    sku                    = "Premium"
-    kerberos_enabled       = true
-    scale_units            = 4
-    tunneling_enabled      = true
-    shareable_link_enabled = true
-    ip_connect_enabled     = true
-    copy_paste_enabled     = true
-    file_copy_enabled      = true
-    zones                  = ["1", "2", "3"]
+    name                      = "bas-private"
+    subnet_id                 = azurerm_subnet.bastion.id
+    sku                       = "Premium"
+    private_only_enabled      = true
+    session_recording_enabled = true
+    kerberos_enabled          = true
+    ip_connect_enabled        = true
+    copy_paste_enabled        = true
+    scale_units               = 4
+    zones                     = ["1", "2", "3"]
 
     tags = {
       Component = "Bastion"
