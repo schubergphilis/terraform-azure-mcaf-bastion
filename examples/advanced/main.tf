@@ -70,6 +70,10 @@ module "bastion" {
     }
   }
 
+  managed_identities = {
+    system_assigned = true
+  }
+
   tags = {
     Environment = "production"
     ManagedBy   = "Terraform"
