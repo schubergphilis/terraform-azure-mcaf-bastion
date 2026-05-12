@@ -99,6 +99,10 @@ The Azure Bastion Host configuration.
     error_message = "IP connect is only available for Standard or Premium SKU."
   }
   validation {
+    condition     = var.bastion.private_only_enabled && var.bastion.ip_connect_enabled ? false : true
+    error_message = "IP connect cannot be enabled when private-only mode is enabled."
+  }
+  validation {
     condition     = var.bastion.file_copy_enabled == true ? contains(["Standard", "Premium"], var.bastion.sku) : true
     error_message = "File copy is only available for Standard or Premium SKU."
   }
