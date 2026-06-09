@@ -1,3 +1,9 @@
+<!-- migrate-repo:banner -->
+> [!IMPORTANT]
+> **This repository has moved to [`schubergphilis-ep/terraform-azure-mcaf-bastion`](https://github.com/schubergphilis-ep/terraform-azure-mcaf-bastion).**
+> Please update your references and use the new location for issues, PRs, and contributions.
+<!-- migrate-repo:banner -->
+
 # terraform-azure-mcaf-bastion
 
 The `terraform-azure-mcaf-bastion` module is a Terraform module designed to deploy and manage an Azure Bastion Host. Azure Bastion is a fully managed service that provides secure and seamless RDP and SSH connectivity to virtual machines directly through the Azure portal. This module simplifies the deployment of Azure Bastion by providing configurable options for various parameters such as SKU, subnet, virtual network, and additional features like Kerberos authentication, tunneling, and session recording.
